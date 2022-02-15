@@ -28,7 +28,7 @@ exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {
         if (!sauce) {
-          return res.status(404).json({ error: new Error('Objet non trouvé') });
+          return res.status(404).json({ error: new Error('Sauce non trouvée') });
         };
         if (sauce.userId !== req.auth.userId) {
           return res.status(404).json({ error: new Error("Requête non authorisée") })
@@ -52,23 +52,96 @@ exports.getAllSauces = (req, res, next) => {
 
 exports.getOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
-      .then(thing => res.status(200).json(thing))
+      .then(sauce => res.status(200).json(sauce))
       .catch(error => res.status(404).json({ error }));
 };
 
 exports.likeSauce = (req, res, next) => {
-  Sauce.updateOne({ _id: req.params.id })
-      .then(thing => res.status(200).json(thing))
-      .catch(error => res.status(404).json({ error }));
+  Sauce.findOne({ _id: req.params.id})
+    .then((sauce) => {
+      if (!sauce) {
+        return res.status(404).json({ error: new Error('Sauce non trouvée')})
+      }
+      if (req.body.like === 1) {
+        if (!sauce.usersLiked.includes(req.body.userId)) {
+          try {
+            Sauce.findByIdAndUpdate(
+              req.params.id,
+              {
+                $addToSet: { usersLiked: req.body.userId },
+                $inc: { likes: 1 }
+              },
+              { new: true },
+              (err, docs) => {
+                if (err) return res.status(400).json({ err })
+                else return res.status(200).json({ docs })
+              }
+            );
+          } catch (err) {
+            return res.status(400).json({ err })
+          }
+        }
+      }
+
+      else if (req.body.like === 0) {
+        if (sauce.usersLiked.includes(req.body.userId)) {
+          try {
+            Sauce.findByIdAndUpdate(
+              req.params.id,
+              {
+                $pull: { usersLiked: req.body.userId },
+                $inc: { likes: -1 }
+              },
+              {new: true },
+              (err, docs) => {
+                if (err) return res.status(400).json({ err })
+                else return res.status(200).json({ docs })
+              }
+            )
+          } catch (err) {
+            return res.status(400).json({ err })
+          }
+        }
+        if (sauce.usersDisliked.includes(req.body.userId)) {
+          try {
+            Sauce.findByIdAndUpdate(
+              req.params.id,
+              {
+                $pull: { usersDisliked: req.body.userId },
+                $inc: { dislikes: -1 }
+              },
+              {new: true },
+              (err, docs) => {
+                if (err) return res.status(400).json({ err })
+                else return res.status(200).json({ docs })
+              }
+            )
+          } catch (err) {
+            return res.status(400).json({ err })
+          }
+        }
+      }
+
+      else if (req.body.like === -1) {
+        if (!sauce.usersDisliked.includes(req.body.userId)) {
+          try {
+            Sauce.findByIdAndUpdate(
+              req.params.id,
+              {
+                $addToSet: { usersDisliked: req.body.userId },
+                $inc: { dislikes: 1 }
+              },
+              { new: true },
+              (err, docs) => {
+                if (err) return res.status(400).json({ err })
+                else return res.status(200).json({ docs })
+              }
+            );
+          } catch (err) {
+            return res.status(400).json({ err })
+          }
+        }
+      }
+      
+    })
 };
-
-/** 
- * if (req.body.like === 1) like++, usersLikedpush: userId
- * if (req.body.like === 0) if (userLikeFindOne: userId) like -- // if (userDislikeFindOne: userId) dislike --
- * if (req.body.like === -1) dislike++, usersDislikedpush: userId
- */
-
-
-
-
-
