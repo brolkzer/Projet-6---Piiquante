@@ -56,6 +56,17 @@ exports.getOneSauce = (req, res, next) => {
       .catch(error => res.status(404).json({ error }));
 };
 
+exports.likeSauce = (req, res, next) => {
+  Sauce.updateOne({ _id: req.params.id })
+      .then(thing => res.status(200).json(thing))
+      .catch(error => res.status(404).json({ error }));
+};
+
+/** 
+ * if (req.body.like === 1) like++, usersLikedpush: userId
+ * if (req.body.like === 0) if (userLikeFindOne: userId) like -- // if (userDislikeFindOne: userId) dislike --
+ * if (req.body.like === -1) dislike++, usersDislikedpush: userId
+ */
 
 
 

@@ -4,10 +4,11 @@ const mongoose = require('mongoose');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 const path = require('path');
+const dotenv = require('dotenv').config({path: "./config/.env"});
 
 
 
-mongoose.connect('mongodb+srv://brolkzer:YQjqFmRJPZzpmkft@hottakesdb.d6d7a.mongodb.net/htdb?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.DB_LOGINS}@hottakesdb.d6d7a.mongodb.net/htdb?retryWrites=true&w=majority`,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
