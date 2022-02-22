@@ -14,7 +14,8 @@ Then, clone this repo, `run npm install`, and `run npm install --save-dev run-sc
 
 ## Usage ##
 
-Run `npm start`. This should both run the local server and launch your browser.
+Run `npm start` on the frontend folder. This should both run the local server and launch your browser.
+Run `nodemon server ` on the backend folder. This should run the local database.
 
 If your browser fails to launch, or shows a 404 error, navigate your browser to http://localhost:8080.
 
